@@ -10,6 +10,7 @@ function OrderForm() {
   });
 
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -24,12 +25,15 @@ function OrderForm() {
 
     try {
 
-      await createOrder({
-        itemId: Number(formData.itemId),
-        quantity: Number(formData.quantity),
+      const response = await createOrder({
+        itemId: parseInt(formData.itemId),
+        quantity: parseInt(formData.quantity),
         customerType: formData.customerType
       });
 
+      console.log("SUCCESS:", response.data);
+
+      setIsError(false);
       setMessage("Order Created Successfully");
 
       setFormData({
@@ -40,9 +44,23 @@ function OrderForm() {
 
     } catch (error) {
 
-      console.error(error);
+      console.error("ERROR:", error);
 
-      setMessage("Failed To Create Order");
+      setIsError(true);
+
+      if (error.response && error.response.data) {
+
+        setMessage(
+          error.response.data.message ||
+          "Request Failed"
+        );
+
+      } else {
+
+        setMessage(
+          "Unable to connect to server"
+        );
+      }
     }
   };
 
@@ -54,7 +72,9 @@ function OrderForm() {
       <form onSubmit={handleSubmit}>
 
         <div className="mb-3">
-          <label>Item ID</label>
+          <label className="form-label">
+            Item ID
+          </label>
 
           <input
             type="number"
@@ -67,7 +87,9 @@ function OrderForm() {
         </div>
 
         <div className="mb-3">
-          <label>Quantity</label>
+          <label className="form-label">
+            Quantity
+          </label>
 
           <input
             type="number"
@@ -80,7 +102,9 @@ function OrderForm() {
         </div>
 
         <div className="mb-3">
-          <label>Customer Type</label>
+          <label className="form-label">
+            Customer Type
+          </label>
 
           <select
             name="customerType"
@@ -88,8 +112,13 @@ function OrderForm() {
             value={formData.customerType}
             onChange={handleChange}
           >
-            <option value="REGULAR">REGULAR</option>
-            <option value="PREMIUM">PREMIUM</option>
+            <option value="REGULAR">
+              REGULAR
+            </option>
+
+            <option value="PREMIUM">
+              PREMIUM
+            </option>
           </select>
         </div>
 
@@ -103,7 +132,13 @@ function OrderForm() {
       </form>
 
       {message && (
-        <div className="alert alert-info mt-3">
+        <div
+          className={
+            isError
+              ? "alert alert-danger mt-3"
+              : "alert alert-success mt-3"
+          }
+        >
           {message}
         </div>
       )}
