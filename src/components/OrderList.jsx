@@ -26,7 +26,7 @@ function OrderList() {
   return (
     <div className="card shadow p-4 mt-4">
 
-      <h2>Orders</h2>
+      <h2>Recent Orders</h2>
 
       <table className="table table-bordered">
 
@@ -45,13 +45,30 @@ function OrderList() {
         <tbody>
 
           {orders.map((order) => (
-            <tr key={order.id}>
+
+            <tr
+              key={order.id}
+              className={
+                order.status === "BACKORDERED"
+                  ? "table-danger"
+                  : ""
+              }
+            >
+
               <td>{order.id}</td>
-              <td>{order.inventoryItem?.name}</td>
+
+              <td>
+                {order.inventoryItem?.name}
+              </td>
+
               <td>{order.quantity}</td>
+
               <td>{order.status}</td>
+
               <td>{order.customerType}</td>
+
             </tr>
+
           ))}
 
         </tbody>
